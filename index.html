@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="te">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Tadipatri Municipality - Citizen Feedback</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    body {
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Noto Sans Telugu', sans-serif;
+      background: #e2e8f0;
+      color: #0f172a;
+      padding: 14px;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+    }
+    .card {
+      background: #ffffff;
+      width: 100%;
+      max-width: 440px;
+      border-radius: 18px;
+      box-shadow: 0 10px 25px rgba(15, 23, 42, 0.12);
+      overflow: hidden;
+      margin-top: 6px;
+    }
+    .header {
+      background: linear-gradient(135deg, #1e3a8a, #0284c7);
+      color: #ffffff;
+      padding: 18px 16px;
+      text-align: center;
+    }
+    .header .badge {
+      display: inline-block;
+      background: rgba(255,255,255,0.2);
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 99px;
+      margin-bottom: 6px;
+      letter-spacing: 0.5px;
+    }
+    .header h2 { font-size: 1.25rem; font-weight: 800; margin-bottom: 4px; }
+    .header p { font-size: 0.95rem; opacity: 0.95; font-weight: 600; }
+
+    .meta-box {
+      background: #f8fafc;
+      border-bottom: 1px solid #cbd5e1;
+      padding: 10px 14px;
+      font-size: 0.82rem;
+      color: #475569;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+    }
+    .meta-box .ward-full { grid-column: span 2; border-top: 1px dashed #cbd5e1; padding-top: 4px; }
+    .meta-box span { font-weight: 700; color: #0f172a; }
+
+    .content { padding: 20px 18px; }
+    .step { display: none; animation: fadeIn 0.25s ease-out; }
+    .step.active { display: block; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .question-en { font-size: 1.02rem; font-weight: 700; color: #0f172a; line-height: 1.45; margin-bottom: 8px; }
+    .question-te { font-size: 0.98rem; font-weight: 600; color: #1e40af; line-height: 1.5; margin-bottom: 16px; }
+
+    .waste-list {
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      border-left: 4px solid #16a34a;
+      padding: 12px 14px;
+      border-radius: 8px;
+      font-size: 0.86rem;
+      margin-bottom: 18px;
+      color: #14532d;
+      line-height: 1.65;
+      font-weight: 600;
+    }
+
+    .btn-group { display: flex; flex-direction: column; gap: 12px; }
+    .btn {
+      width: 100%;
+      padding: 15px 16px;
+      border-radius: 12px;
+      border: none;
+      font-size: 1.02rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.08);
+    }
+    .btn:active { transform: scale(0.98); }
+    .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+    .btn-green { background: #16a34a; color: #ffffff; }
+    .btn-red { background: #dc2626; color: #ffffff; }
+    .btn small { font-size: 0.88rem; font-weight: 600; opacity: 0.95; }
+
+    .result-box { text-align: center; padding: 14px 4px; }
+    .result-icon { font-size: 3.4rem; margin-bottom: 10px; line-height: 1; }
+    .title-green { color: #15803d; font-size: 1.3rem; font-weight: 800; }
+    .title-red { color: #b91c1c; font-size: 1.25rem; font-weight: 800; }
+    .title-blue { color: #1d4ed8; font-size: 1.2rem; font-weight: 800; }
+
+    .notice-card {
+      margin-top: 14px;
+      padding: 14px;
+      border-radius: 10px;
+      text-align: left;
+      font-size: 0.88rem;
+      line-height: 1.55;
+    }
+    .notice-warn { background: #fef2f2; border: 1.5px solid #fecaca; color: #991b1b; }
+    .notice-info { background: #eff6ff; border: 1.5px solid #bfdbfe; color: #1e3a8a; }
+    .loader {
+      display: none;
+      text-align: center;
+      padding: 28px 10px;
+      font-weight: 700;
+      color: #0284c7;
+      font-size: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="header">
+      <div class="badge">TMC SANITATION PORTAL</div>
+      <h2>Tadipatri Municipality</h2>
+      <p>తాడిపత్రి పురపాలక సంఘం</p>
+    </div>
+
+    <div class="meta-box">
+      <div>Door No: <span id="lblDoor">-</span></div>
+      <div>Assessment: <span id="lblAssess">-</span></div>
+      <div class="ward-full">Ward: <span id="lblWard">Krishnapuram - 01</span></div>
+    </div>
+
+    <div class="content">
+      <div id="loader" class="loader">
+        ⏳ Recording your response...<br>
+        <span style="font-size:0.9rem; color:#475569;">మీ సమాచారం నమోదు అవుతోంది...</span>
+      </div>
+
+      <!-- ALREADY RECORDED TODAY SCREEN -->
+      <div id="stepAlreadyDone" class="step result-box">
+        <div class="result-icon">✅</div>
+        <div class="title-blue">Already Recorded Today!</div>
+        <p style="margin-top:4px; font-weight:700; color:#1e40af;">ఈరోజు మీ అభిప్రాయం ఇప్పటికే నమోదు చేయబడింది!</p>
+        <div class="notice-card notice-info">
+          ఒక ఇంటికి రోజుకు ఒకసారి మాత్రమే నమోదు చేసుకునే వీలుంది. రేపు ఉదయం చెత్త వాహనం వచ్చినప్పుడు మళ్లీ స్కాన్ చేయగలరు.
+        </div>
+      </div>
+
+      <!-- QUESTION 1 -->
+      <div id="step1" class="step">
+        <div class="question-en">Q). Did the garbage truck come to your house today?</div>
+        <div class="question-te">ప్ర). ఈరోజు మీ ఇంటి వద్దకు చెత్త సేకరించే వాహనం వచ్చిందా?</div>
+        <div class="btn-group">
+          <button class="btn btn-green" onclick="handleQ1('Came')">
+            <span>Came</span>
+            <small>వచ్చింది</small>
+          </button>
+          <button class="btn btn-red" onclick="handleQ1('Didn\'t come')">
+            <span>Didn't come</span>
+            <small>రాలేదు</small>
+          </button>
+        </div>
+      </div>
+
+      <!-- QUESTION 2 -->
+      <div id="step2" class="step">
+        <div class="question-en">Q). Do you separate the garbage in your house into four types and give it to the garbage truck?</div>
+        <div class="question-te">ప్ర). మీ ఇంటిలోని చెత్తను 4 రకాలుగా వేరుచేసి చెత్త వాహనానికి ఇస్తున్నారా?</div>
+        <div class="waste-list">
+          1. Wet waste (తడి చెత్త)<br>
+          2. Dry waste (పొడి చెత్త)<br>
+          3. Sanitary waste (శానిటరీ వ్యర్థాలు)<br>
+          4. Special care waste (ప్రత్యేక శ్రద్ధ వ్యర్థాలు)
+        </div>
+        <div class="btn-group">
+          <button class="btn btn-green" onclick="handleQ2('Yes')">
+            <span>Yes</span>
+            <small>అవును (ఇస్తున్నాము)</small>
+          </button>
+          <button class="btn btn-red" onclick="handleQ2('No')">
+            <span>No</span>
+            <small>లేదు (ఇవ్వడం లేదు)</small>
+          </button>
+        </div>
+      </div>
+
+      <!-- RESULT: YES (GOOD, THANK YOU) -->
+      <div id="resultSuccess" class="step result-box">
+        <div class="result-icon">🌟</div>
+        <div class="title-green">Good, Thank You...</div>
+        <p style="margin-top:6px; color:#15803d; font-size:1.05rem; font-weight:700;">చాలా మంచిది, ధన్యవాదాలు!</p>
+        <p style="margin-top:10px; font-size:0.88rem; color:#334155; line-height:1.5;">
+          Thank you for segregating your waste and supporting a clean Tadipatri Municipality.<br>
+          చెత్తను వేరుచేసి అందిస్తూ స్వచ్ఛ తాడిపత్రి నిర్మాణంలో సహకరిస్తున్నందుకు ధన్యవాదాలు.
+        </p>
+      </div>
+
+      <!-- RESULT: NO (WARNING NOTICE) -->
+      <div id="resultWarning" class="step result-box">
+        <div class="result-icon">⚠️</div>
+        <div class="title-red">Warning / హెచ్చరిక!</div>
+        <div class="notice-card notice-warn">
+          <strong>Strict Municipal Notice:</strong><br>
+          Giving unsegregated (mixed) waste is a violation of rules. Household waste must be separated into <strong>1. Wet, 2. Dry, 3. Sanitary & 4. Special care</strong>.<br><br>
+          <strong>పురపాలక సంఘం హెచ్చరిక:</strong><br>
+          తడి, పొడి, శానిటరీ మరియు ప్రత్యేక వ్యర్థాలను కలపకుండా 4 రకాలుగా వేరుచేసి ఇవ్వడం ప్రతి ఇంటి బాధ్యత. చెత్తను కలిపి ఇచ్చినట్లయితే మున్సిపల్ నిబంధనల ప్రకారం జరిమానా విధించబడుతుంది.
+        </div>
+      </div>
+
+      <!-- RESULT: TRUCK DIDN'T COME -->
+      <div id="resultNoTruck" class="step result-box">
+        <div class="result-icon">📋</div>
+        <div class="title-red">Complaint Recorded / నమోదు చేయబడింది</div>
+        <div class="notice-card notice-warn">
+          ఈరోజు మీ ఇంటి వద్దకు చెత్త వాహనం రాలేదన్న సమాచారం నమోదు చేయబడింది. వార్డు పారిశుధ్య అధికారుల దృష్టికి తీసుకెళ్లబడుతుంది.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // PASTE YOUR GOOGLE APPS SCRIPT WEB APP URL HERE:
+    var SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzpG9sSJpROZcHgWW5jGZwr7CHb19YHez-mRcx9X_adyzElekGwvMx5EEfWKy8ym5lH-g/exec";
+
+    var urlParams = new URLSearchParams(window.location.search);
+    var doorNo = urlParams.get('d') || '-';
+    var assessNo = urlParams.get('a') || '-';
+    var ward = urlParams.get('w') || 'Krishnapuram - 01';
+
+    document.getElementById('lblDoor').textContent = doorNo;
+    document.getElementById('lblAssess').textContent = assessNo;
+    document.getElementById('lblWard').textContent = ward;
+
+    var todayStr = new Date().toISOString().split('T')[0];
+    var storageKey = 'tmc_sub_' + assessNo + '_' + todayStr;
+
+    window.onload = function() {
+      if (localStorage.getItem(storageKey)) {
+        showStep('stepAlreadyDone');
+      } else {
+        showStep('step1');
+      }
+    };
+
+    function showStep(id) {
+      document.querySelectorAll('.step').forEach(el => el.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+    }
+
+    var formData = { doorNo: doorNo, assessmentNo: assessNo, ward: ward, truckArrived: '', segregated: 'N/A' };
+
+    function handleQ1(ans) {
+      formData.truckArrived = ans;
+      if (ans === 'Came') {
+        showStep('step2');
+      } else {
+        formData.segregated = 'N/A';
+        submitData('resultNoTruck');
+      }
+    }
+
+    function handleQ2(ans) {
+      formData.segregated = ans;
+      if (ans === 'Yes') {
+        submitData('resultSuccess');
+      } else {
+        submitData('resultWarning');
+      }
+    }
+
+    function submitData(nextScreenId) {
+      document.getElementById('step1').classList.remove('active');
+      document.getElementById('step2').classList.remove('active');
+      document.getElementById('loader').style.display = 'block';
+
+      localStorage.setItem(storageKey, 'true');
+
+      fetch(SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify(formData)
+      }).then(function() {
+        document.getElementById('loader').style.display = 'none';
+        showStep(nextScreenId);
+      }).catch(function() {
+        document.getElementById('loader').style.display = 'none';
+        showStep(nextScreenId);
+      });
+    }
+  </script>
+</body>
+</html>

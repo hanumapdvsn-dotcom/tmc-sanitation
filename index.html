@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Tadipatri Municipality - Citizen Feedback</title>
+  <title>Tadipatri Municipality - Sanitation Monitoring</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
     body {
@@ -65,8 +65,8 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
-    .question-en { font-size: 1.02rem; font-weight: 700; color: #0f172a; line-height: 1.45; margin-bottom: 8px; }
-    .question-te { font-size: 0.98rem; font-weight: 600; color: #1e40af; line-height: 1.5; margin-bottom: 16px; }
+    .question-en { font-size: 1.02rem; font-weight: 700; color: #0f172a; line-height: 1.45; margin-bottom: 6px; }
+    .question-te { font-size: 0.96rem; font-weight: 600; color: #1e40af; line-height: 1.5; margin-bottom: 16px; }
 
     .waste-list {
       background: #f0fdf4;
@@ -84,10 +84,10 @@
     .btn-group { display: flex; flex-direction: column; gap: 12px; }
     .btn {
       width: 100%;
-      padding: 15px 16px;
+      padding: 14px 16px;
       border-radius: 12px;
       border: none;
-      font-size: 1.02rem;
+      font-size: 1rem;
       font-weight: 700;
       cursor: pointer;
       display: flex;
@@ -97,15 +97,43 @@
       box-shadow: 0 3px 6px rgba(0,0,0,0.08);
     }
     .btn:active { transform: scale(0.98); }
-    .btn:disabled { opacity: 0.6; cursor: not-allowed; }
     .btn-green { background: #16a34a; color: #ffffff; }
     .btn-red { background: #dc2626; color: #ffffff; }
-    .btn small { font-size: 0.88rem; font-weight: 600; opacity: 0.95; }
+    .btn-blue { background: #0284c7; color: #ffffff; margin-top: 10px; }
+    .btn small { font-size: 0.85rem; font-weight: 600; opacity: 0.95; }
+
+    .phone-input-box {
+      margin-top: 14px;
+      background: #f8fafc;
+      border: 1.5px solid #cbd5e1;
+      padding: 14px;
+      border-radius: 12px;
+    }
+    .phone-input-box label {
+      display: block;
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 6px;
+    }
+    .phone-input {
+      width: 100%;
+      padding: 12px;
+      font-size: 1.1rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      border: 2px solid #94a3b8;
+      border-radius: 8px;
+      outline: none;
+      text-align: center;
+    }
+    .phone-input:focus { border-color: #0284c7; }
+    .input-error { color: #dc2626; font-size: 0.8rem; font-weight: 700; margin-top: 4px; display: none; }
 
     .result-box { text-align: center; padding: 14px 4px; }
-    .result-icon { font-size: 3.4rem; margin-bottom: 10px; line-height: 1; }
-    .title-green { color: #15803d; font-size: 1.3rem; font-weight: 800; }
-    .title-red { color: #b91c1c; font-size: 1.25rem; font-weight: 800; }
+    .result-icon { font-size: 3.2rem; margin-bottom: 10px; line-height: 1; }
+    .title-green { color: #15803d; font-size: 1.25rem; font-weight: 800; }
+    .title-red { color: #b91c1c; font-size: 1.2rem; font-weight: 800; }
     .title-blue { color: #1d4ed8; font-size: 1.2rem; font-weight: 800; }
 
     .notice-card {
@@ -113,11 +141,23 @@
       padding: 14px;
       border-radius: 10px;
       text-align: left;
-      font-size: 0.88rem;
+      font-size: 0.85rem;
       line-height: 1.55;
     }
     .notice-warn { background: #fef2f2; border: 1.5px solid #fecaca; color: #991b1b; }
     .notice-info { background: #eff6ff; border: 1.5px solid #bfdbfe; color: #1e3a8a; }
+
+    .law-reference {
+      background: #ffffff;
+      border: 1px solid #f87171;
+      padding: 8px 10px;
+      border-radius: 6px;
+      font-size: 0.78rem;
+      color: #7f1d1d;
+      margin-top: 8px;
+      font-weight: 600;
+    }
+
     .loader {
       display: none;
       text-align: center;
@@ -144,40 +184,66 @@
 
     <div class="content">
       <div id="loader" class="loader">
-        ⏳ Recording your response...<br>
-        <span style="font-size:0.9rem; color:#475569;">మీ సమాచారం నమోదు అవుతోంది...</span>
+        ⏳ Verifying / Recording...<br>
+        <span style="font-size:0.9rem; color:#475569;">సమాచారం నమోదు అవుతోంది...</span>
       </div>
 
       <!-- ALREADY RECORDED TODAY SCREEN -->
       <div id="stepAlreadyDone" class="step result-box">
         <div class="result-icon">✅</div>
         <div class="title-blue">Already Recorded Today!</div>
-        <p style="margin-top:4px; font-weight:700; color:#1e40af;">ఈరోజు మీ అభిప్రాయం ఇప్పటికే నమోదు చేయబడింది!</p>
+        <p style="margin-top:4px; font-weight:700; color:#1e40af;">ఈరోజు మీ ఇంటి సమాచారం ఇప్పటికే నమోదైంది!</p>
         <div class="notice-card notice-info">
-          ఒక ఇంటికి రోజుకు ఒకసారి మాత్రమే నమోదు చేసుకునే వీలుంది. రేపు ఉదయం చెత్త వాహనం వచ్చినప్పుడు మళ్లీ స్కాన్ చేయగలరు.
+          As per municipal policy, only <strong>one response per household per day</strong> is permitted. Our sanitation monitoring team has your entry for today.<br><br>
+          మున్సిపల్ నిబంధన ప్రకారం రోజుకు ఒకసారి మాత్రమే నమోదు చేయగలరు. రేపు వాహనం వచ్చినప్పుడు మళ్లీ స్కాన్ చేయండి.
         </div>
       </div>
 
-      <!-- QUESTION 1 -->
+      <!-- QUESTION 1: TRUCK ARRIVAL -->
       <div id="step1" class="step">
         <div class="question-en">Q). Did the garbage truck come to your house today?</div>
         <div class="question-te">ప్ర). ఈరోజు మీ ఇంటి వద్దకు చెత్త సేకరించే వాహనం వచ్చిందా?</div>
         <div class="btn-group">
-          <button class="btn btn-green" onclick="handleQ1('Came')">
-            <span>Came</span>
+          <button class="btn btn-green" onclick="handleQ1('Yes')">
+            <span>Option 1: Yes</span>
             <small>వచ్చింది</small>
           </button>
-          <button class="btn btn-red" onclick="handleQ1('Didn\'t come')">
-            <span>Didn't come</span>
+          <button class="btn btn-red" onclick="handleQ1('No')">
+            <span>Option 2: No</span>
             <small>రాలేదు</small>
           </button>
         </div>
       </div>
 
-      <!-- QUESTION 2 -->
+      <!-- FOLLOW-UP PHONE INPUT (APPEARS WHEN Q1 = NO) -->
+      <div id="stepPhone" class="step">
+        <div class="question-en" style="color:#b91c1c;">Garbage Truck Missed Report</div>
+        <div class="question-te">చెత్త వాహనం రాలేదనే ఫిర్యాదు నమోదు</div>
+        
+        <div class="phone-input-box">
+          <label>Enter 10-Digit Mobile Number / మీ మొబైల్ నంబర్:</label>
+          <input type="tel" id="mobileInput" class="phone-input" maxlength="10" placeholder="98XXXXXXXX" oninput="validatePhone()">
+          <div id="phoneError" class="input-error">Please enter a valid 10-digit mobile number</div>
+          <p style="font-size:0.75rem; color:#64748b; margin-top:6px;">
+            *Our municipal sanitation team will call this number to verify and resolve the issue.<br>
+            *సమస్య పరిష్కారం కొరకు మున్సిపల్ సిబ్బంది మిమ్మల్ని సంప్రదిస్తారు.
+          </p>
+        </div>
+
+        <button class="btn btn-blue" onclick="submitNoTruckComplaint()">
+          <span>Submit Complaint</span>
+          <small>ఫిర్యాదు నమోదు చేయండి</small>
+        </button>
+      </div>
+
+      <!-- QUESTION 2: 4-STREAM SEGREGATION -->
       <div id="step2" class="step">
-        <div class="question-en">Q). Do you separate the garbage in your house into four types and give it to the garbage truck?</div>
-        <div class="question-te">ప్ర). మీ ఇంటిలోని చెత్తను 4 రకాలుగా వేరుచేసి చెత్త వాహనానికి ఇస్తున్నారా?</div>
+        <div class="question-en">
+          Q). Do you separate the garbage in your house into four types and give it to the garbage truck?
+        </div>
+        <div class="question-te">
+          ప్ర). మీ ఇంటిలోని చెత్తను 4 రకాలుగా వేరుచేసి చెత్త వాహనానికి ఇస్తున్నారా?
+        </div>
         <div class="waste-list">
           1. Wet waste (తడి చెత్త)<br>
           2. Dry waste (పొడి చెత్త)<br>
@@ -186,52 +252,61 @@
         </div>
         <div class="btn-group">
           <button class="btn btn-green" onclick="handleQ2('Yes')">
-            <span>Yes</span>
+            <span>Option 1: Yes</span>
             <small>అవును (ఇస్తున్నాము)</small>
           </button>
           <button class="btn btn-red" onclick="handleQ2('No')">
-            <span>No</span>
+            <span>Option 2: No</span>
             <small>లేదు (ఇవ్వడం లేదు)</small>
           </button>
         </div>
       </div>
 
-      <!-- RESULT: YES (GOOD, THANK YOU) -->
+      <!-- RESULT: YES (COMPLIANCE THANK YOU) -->
       <div id="resultSuccess" class="step result-box">
         <div class="result-icon">🌟</div>
         <div class="title-green">Good, Thank You...</div>
         <p style="margin-top:6px; color:#15803d; font-size:1.05rem; font-weight:700;">చాలా మంచిది, ధన్యవాదాలు!</p>
         <p style="margin-top:10px; font-size:0.88rem; color:#334155; line-height:1.5;">
-          Thank you for segregating your waste and supporting a clean Tadipatri Municipality.<br>
-          చెత్తను వేరుచేసి అందిస్తూ స్వచ్ఛ తాడిపత్రి నిర్మాణంలో సహకరిస్తున్నందుకు ధన్యవాదాలు.
+          Thank you for segregating waste at source and keeping Tadipatri clean and healthy.<br>
+          చెత్తను 4 రకాలుగా వేరుచేసి అందిస్తూ స్వచ్ఛ తాడిపత్రికి సహకరిస్తున్నందుకు ధన్యవాదాలు.
         </p>
       </div>
 
-      <!-- RESULT: NO (WARNING NOTICE) -->
+      <!-- RESULT: NO (STATUTORY SWM 2026 WARNING) -->
       <div id="resultWarning" class="step result-box">
         <div class="result-icon">⚠️</div>
-        <div class="title-red">Warning / హెచ్చరిక!</div>
+        <div class="title-red">Statutory Warning / చట్టపరమైన హెచ్చరిక!</div>
         <div class="notice-card notice-warn">
-          <strong>Strict Municipal Notice:</strong><br>
-          Giving unsegregated (mixed) waste is a violation of rules. Household waste must be separated into <strong>1. Wet, 2. Dry, 3. Sanitary & 4. Special care</strong>.<br><br>
-          <strong>పురపాలక సంఘం హెచ్చరిక:</strong><br>
-          తడి, పొడి, శానిటరీ మరియు ప్రత్యేక వ్యర్థాలను కలపకుండా 4 రకాలుగా వేరుచేసి ఇవ్వడం ప్రతి ఇంటి బాధ్యత. చెత్తను కలిపి ఇచ్చినట్లయితే మున్సిపల్ నిబంధనల ప్రకారం జరిమానా విధించబడుతుంది.
+          <strong>Mandatory Waste Segregation Notice:</strong><br>
+          Handing over unsegregated or mixed municipal solid waste is strictly prohibited. Every household is legally required to segregate waste into 4 streams (Wet, Dry, Sanitary & Domestic Hazardous/Special Care).
+          
+          <div class="law-reference">
+            <strong>Legal Reference:</strong><br>
+            • <strong>Rule 4(1), Solid Waste Management Rules, 2026</strong> (Duties of Waste Generators)<br>
+            • Tadipatri Municipality Solid Waste Handling By-Laws.<br>
+            <em>Non-compliance will lead to refusal of waste collection and imposition of municipal spot fines.</em>
+          </div>
+
+          <p style="margin-top:8px;">
+            <strong>మున్సిపల్ నిబంధన:</strong> తడి, పొడి, శానిటరీ, ప్రమాదకర వ్యర్థాలను కలపడం చట్టరీత్యా నేరం. విధిగా 4 రకాలుగా వేరుచేసి వాహనానికి అందించాలి. నిబంధనలు పాటించని యెడల జరిమానా విధించబడుతుంది.
+          </p>
         </div>
       </div>
 
-      <!-- RESULT: TRUCK DIDN'T COME -->
+      <!-- RESULT: TRUCK MISSED CONFIRMATION -->
       <div id="resultNoTruck" class="step result-box">
         <div class="result-icon">📋</div>
-        <div class="title-red">Complaint Recorded / నమోదు చేయబడింది</div>
+        <div class="title-red">Complaint Logged / ఫిర్యాదు నమోదైంది</div>
         <div class="notice-card notice-warn">
-          ఈరోజు మీ ఇంటి వద్దకు చెత్త వాహనం రాలేదన్న సమాచారం నమోదు చేయబడింది. వార్డు పారిశుధ్య అధికారుల దృష్టికి తీసుకెళ్లబడుతుంది.
+          Your complaint regarding garbage truck absence has been sent to the Ward Sanitary Inspector along with your mobile contact for prompt redressing.<br><br>
+          చెత్త వాహనం రాలేదన్న మీ ఫిర్యాదు సంబంధిత వార్డు శానిటరీ ఇన్‌స్పెక్టర్‌కు చేరింది. త్వరలోనే తగిన చర్యలు తీసుకుంటారు.
         </div>
       </div>
     </div>
   </div>
 
   <script>
-    // PASTE YOUR GOOGLE APPS SCRIPT WEB APP URL HERE:
     var SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzpG9sSJpROZcHgWW5jGZwr7CHb19YHez-mRcx9X_adyzElekGwvMx5EEfWKy8ym5lH-g/exec";
 
     var urlParams = new URLSearchParams(window.location.search);
@@ -244,48 +319,94 @@
     document.getElementById('lblWard').textContent = ward;
 
     var todayStr = new Date().toISOString().split('T')[0];
-    var storageKey = 'tmc_sub_' + assessNo + '_' + todayStr;
+    var localKey = 'tmc_today_' + assessNo + '_' + todayStr;
+
+    var formData = {
+      doorNo: doorNo,
+      assessmentNo: assessNo,
+      ward: ward,
+      truckArrived: '',
+      segregated: 'N/A',
+      mobileNo: ''
+    };
 
     window.onload = function() {
-      if (localStorage.getItem(storageKey)) {
+      // 1. Fast local check
+      if (localStorage.getItem(localKey)) {
         showStep('stepAlreadyDone');
-      } else {
-        showStep('step1');
+        return;
       }
+
+      // 2. Authoritative server check
+      document.getElementById('loader').style.display = 'block';
+      fetch(SCRIPT_URL + '?action=checkStatus&a=' + encodeURIComponent(assessNo) + '&d=' + encodeURIComponent(doorNo))
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+          document.getElementById('loader').style.display = 'none';
+          if (data && data.submitted) {
+            localStorage.setItem(localKey, 'true');
+            showStep('stepAlreadyDone');
+          } else {
+            showStep('step1');
+          }
+        })
+        .catch(function() {
+          document.getElementById('loader').style.display = 'none';
+          showStep('step1');
+        });
     };
 
     function showStep(id) {
-      document.querySelectorAll('.step').forEach(el => el.classList.remove('active'));
+      var steps = document.querySelectorAll('.step');
+      for (var i = 0; i < steps.length; i++) steps[i].classList.remove('active');
       document.getElementById(id).classList.add('active');
     }
 
-    var formData = { doorNo: doorNo, assessmentNo: assessNo, ward: ward, truckArrived: '', segregated: 'N/A' };
-
-    function handleQ1(ans) {
-      formData.truckArrived = ans;
-      if (ans === 'Came') {
+    function handleQ1(choice) {
+      formData.truckArrived = choice; // 'Yes' or 'No'
+      if (choice === 'Yes') {
         showStep('step2');
       } else {
-        formData.segregated = 'N/A';
-        submitData('resultNoTruck');
+        // Truck did not come -> Open 10-digit mobile box
+        showStep('stepPhone');
       }
     }
 
-    function handleQ2(ans) {
-      formData.segregated = ans;
-      if (ans === 'Yes') {
-        submitData('resultSuccess');
+    function validatePhone() {
+      var input = document.getElementById('mobileInput');
+      input.value = input.value.replace(/\D/g, ''); // Digits only
+      var valid = /^[6-9]\d{9}$/.test(input.value);
+      document.getElementById('phoneError').style.display = (input.value.length === 10 && !valid) ? 'block' : 'none';
+      return valid;
+    }
+
+    function submitNoTruckComplaint() {
+      var input = document.getElementById('mobileInput');
+      var val = input.value.trim();
+      if (!/^[6-9]\d{9}$/.test(val)) {
+        document.getElementById('phoneError').style.display = 'block';
+        input.focus();
+        return;
+      }
+      formData.mobileNo = val;
+      formData.segregated = 'N/A';
+      submitToSheet('resultNoTruck');
+    }
+
+    function handleQ2(choice) {
+      formData.segregated = choice; // 'Yes' or 'No'
+      if (choice === 'Yes') {
+        submitToSheet('resultSuccess');
       } else {
-        submitData('resultWarning');
+        submitToSheet('resultWarning');
       }
     }
 
-    function submitData(nextScreenId) {
-      document.getElementById('step1').classList.remove('active');
-      document.getElementById('step2').classList.remove('active');
+    function submitToSheet(targetScreen) {
+      document.querySelectorAll('.step').forEach(function(el) { el.classList.remove('active'); });
       document.getElementById('loader').style.display = 'block';
 
-      localStorage.setItem(storageKey, 'true');
+      localStorage.setItem(localKey, 'true');
 
       fetch(SCRIPT_URL, {
         method: 'POST',
@@ -294,10 +415,10 @@
         body: JSON.stringify(formData)
       }).then(function() {
         document.getElementById('loader').style.display = 'none';
-        showStep(nextScreenId);
+        showStep(targetScreen);
       }).catch(function() {
         document.getElementById('loader').style.display = 'none';
-        showStep(nextScreenId);
+        showStep(targetScreen);
       });
     }
   </script>
